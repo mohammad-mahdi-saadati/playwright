@@ -8,7 +8,7 @@ import re
 SITE_URL = "https://www.eduland.ir/auth/login"
 USERNAME = "danesh_t1"
 PASSWORD = "danesh_t1"
-SUBJECT = "علوم"
+SUBJECT = "فارسی"
 SUBJECT_INDEX = 3
 def run():
     with sync_playwright() as p:
