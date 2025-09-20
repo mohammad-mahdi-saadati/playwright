@@ -850,7 +850,9 @@ lessons_math6_chapter7 = [
     "درس 1","درس 1","درس 1","درس 1",
     # درس 2: 4 مهارت
     "درس 2","درس 2","درس 2","درس 2",]
-
+chapters_math3=[
+    "الگو‌ها","عددهای چهار رقمی","عددهای کسری","ضرب‌و‌تقسیم","محیط‌ومساحت","جمع‌وتفریق","آمار‌واحتمال","ضرب‌عددها"
+]
 # ------------------------------
 # 1. باز کردن سایت
 # ------------------------------
@@ -992,6 +994,7 @@ def click_subject(
             verbose=verbose
         )
         return False
+
 # ------------------------------
 # 4. کلیک روی یک مهارت خاص
 # ------------------------------
@@ -1047,39 +1050,77 @@ def click_skills_by_name(
     end: int = None,
     click_subject=None,
     use_submit_test: bool = False,
-    use_go_through_levels: bool = False
+    use_go_through_levels: bool = False,
+    math_chapter_index: int = None,  # شماره فصل ریاضی (مثلاً 0 تا 7)
+    subject_index: int = None        # 👈 3=ریاضی سوم، 4=ریاضی چهارم، ...
 ):
     """
     کلیک روی مهارت‌ها بر اساس دو لیست موازی (skills, chapters)
-    + قبل از شروع → همه فلش‌های بازکننده فصل‌ها کلیک می‌شوند تا مطمئن شویم مهارت‌ها قابل مشاهده‌اند
+    + قبل از شروع → همه فلش‌های بازکننده فصل‌ها کلیک می‌شوند
+    + اگر به صفحه کلاس‌ها یا تکالیف برگشت → دوباره click_subject اجرا می‌شود
+    + اگر درس ریاضی بود و subject_index و math_chapter_index داده شدند → فصل درست انتخاب می‌شود
     """
+
+    chapters_math3 = ["الگو‌ها","عددهای چهار رقمی","عددهای کسری","ضرب‌و‌تقسیم","محیط‌ومساحت","جمع‌وتفریق","آمار‌واحتمال","ضرب‌عددها"]
+    chapters_math4 = ["الگوها","کسر","ضرب و تقسیم","اندازه‌گیری","عدد مخلوط و عدد اعشاری","شکل‌های هندسی","آمار و احتمال"]
+    chapters_math5 = ["عددنویسی‌ و الگوها","کسر","نسبت، تناسب و درصد","تقارن و چندضلعی‌ها","عددهای اعشاری","اندازه‌گیری","آمار و احتمال"]
+    chapters_math6 = ["عدد و الگو‌های عددی","کسر","اعداد اعشاری","تقارن و مختصات","اندازه‌گیری","تناسب و درصد","تقریب",]
+
+    # انتخاب لیست بر اساس subject_index
+    math_chapters = None
+    if subject_index == 3:
+        math_chapters = chapters_math3
+    elif subject_index == 4:
+        math_chapters = chapters_math4
+    elif subject_index == 5:
+        math_chapters = chapters_math5
+    elif subject_index == 6:
+        math_chapters = chapters_math6
 
     if start is None:
         start = 0
     if end is None or end > len(skills):
         end = len(skills)
 
-    # 🔽 مرحله جدید: باز کردن همه فصل‌ها قبل از شروع
-    try:
-        toggles = page.locator(".v-expansion-panel .v-expansion-panel__toggle-icon")  # selector باید بررسی شود
-        toggle_count = toggles.count()
-        if toggle_count > 0:
-            print(f"🔽 Found {toggle_count} chapter toggles → expanding all...")
-            for i in range(toggle_count):
-                try:
-                    toggles.nth(i).click()
-                    page.wait_for_timeout(300)
-                except Exception as e:
-                    print(f"⚠️ Could not click toggle {i}: {e}")
-            page.wait_for_timeout(1000)  # صبر کن تا DOM کامل به‌روز شود
-        else:
-            print("ℹ️ No chapter toggles found, continuing...")
-    except Exception as e:
-        print(f"⚠️ Could not expand chapters automatically: {e}")
-
     seen_counts = {}
+
+    def ensure_subject_is_open():
+        """بررسی می‌کند اگر به صفحه کلاس‌ها برگشت دوباره وارد درس شود"""
+        try:
+            if (page.locator("text=کلاس‌های من").is_visible() or 
+                page.locator("text=گزارش تکالیف").is_visible() or 
+                page.locator("text=تکالیف جاری").is_visible()):
+                print("🔄 Returned to class page → re-clicking subject...")
+                if click_subject:
+                    click_subject(page)
+                    page.wait_for_timeout(2000)
+        except Exception:
+            pass
+
+    def select_math_chapter():
+        """اگر لیست فصل‌ها موجود بود و شماره فصل داده شد → انتخاب همان فصل"""
+        if math_chapters and math_chapter_index is not None:
+            try:
+                if 0 <= math_chapter_index < len(math_chapters):
+                    chapter_name = math_chapters[math_chapter_index]
+                    print(f"📑 Selecting math chapter: {chapter_name}")
+                    chapter_button = page.get_by_role("button", name=chapter_name)
+                    if chapter_button.count() > 0:
+                        chapter_button.first.click()
+                        page.wait_for_timeout(1000)
+                    else:
+                        print(f"⚠️ Chapter button '{chapter_name}' not found!")
+                else:
+                    print(f"⚠️ math_chapter_index {math_chapter_index} is out of range for selected grade")
+            except Exception as e:
+                print(f"⚠️ Could not select math chapter: {e}")
+
     i = start
     while i < end:
+        ensure_subject_is_open()
+        if math_chapters:  # فقط اگر ریاضی بود
+            select_math_chapter()
+
         skill = skills[i]
         chapter = chapters[i]
         
@@ -1088,10 +1129,13 @@ def click_skills_by_name(
             seen_counts[skill] = nth_index + 1
 
             print(f"\n🔹 Trying skill {i+1}/{len(skills)}: {skill} (nth={nth_index}, chapter={chapter})")
-            page.click("text=الگوها")
+
             links = page.get_by_role("link", name=skill)
-            page.wait_for_timeout(0)
-            count = links.count()
+            cards = page.locator(".v-card", has_text=skill)
+            target = links if links.count() > 0 else cards
+
+            page.wait_for_timeout(300)
+            count = target.count()
 
             if count == 0:
                 print(f"⚠️ Skill '{skill}' not visible, start scrolling...")
@@ -1099,9 +1143,13 @@ def click_skills_by_name(
                 while True:
                     page.mouse.wheel(0, 400)
                     page.wait_for_timeout(800)
+                    ensure_subject_is_open()
 
                     links = page.get_by_role("link", name=skill)
-                    count = links.count()
+                    cards = page.locator(".v-card", has_text=skill)
+                    target = links if links.count() > 0 else cards
+                    count = target.count()
+
                     if count > 0:
                         print(f"✅ Found {count} occurrence(s) of '{skill}' after scrolling.")
                         break
@@ -1117,7 +1165,8 @@ def click_skills_by_name(
 
             index_to_click = nth_index if nth_index < count else count - 1
             print(f"👉 Clicking {skill} [occurrence {index_to_click}]")
-            links.nth(index_to_click).click()
+            target.nth(index_to_click).scroll_into_view_if_needed()
+            target.nth(index_to_click).click()
             page.wait_for_timeout(wait_time)
 
             submit_button = page.locator("button:has-text('ارسال پاسخ')")
@@ -1127,9 +1176,7 @@ def click_skills_by_name(
             if page.locator("text=خطا در دریافت سوال").is_visible():
                 print("⚠️ خطا در دریافت سوال دیده شد → بازگشت به صفحه مهارت‌ها و ادامه...")
                 detect_and_report_bug(page, chapter, skill, stage="receive_error")
-                if click_subject:
-                    click_subject(page)
-                    page.wait_for_timeout(1500)
+                ensure_subject_is_open()
                 i += 1
                 continue
 
@@ -1141,12 +1188,14 @@ def click_skills_by_name(
 
             page.go_back()
             page.wait_for_timeout(2000)
+            ensure_subject_is_open()
 
         except Exception as e:
             print(f"❌ Could not open skill {skill}: {str(e)}")
             detect_and_report_bug(page, chapter, skill, stage="exception")
             page.go_back()
             page.wait_for_timeout(2000)
+            ensure_subject_is_open()
 
         i += 1
 

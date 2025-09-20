@@ -23,7 +23,8 @@ def run():
         #end=20,
         click_subject=(lambda p: functions.click_subject(p, SUBJECT, SUBJECT_INDEX)),
         use_submit_test=False,
-        use_go_through_levels=True
+        use_go_through_levels=True,
+        subject_index= 3
         )
 
 run()
