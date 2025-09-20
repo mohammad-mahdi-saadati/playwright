@@ -953,7 +953,7 @@ def click_subject(
     """
 
     # مپ اصلاح subject_index (بعضی درس‌ها جابجا می‌شوند)
-    mapping = {3: 1, 4: 2, 5: 3, 6: 4}
+    mapping = {3: 7, 4: 1, 5: 2, 6: 3}
     subject_index = mapping.get(subject_index, subject_index)
 
     try:
