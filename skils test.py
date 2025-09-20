@@ -17,13 +17,13 @@ def run():
         functions.click_subject(page, SUBJECT, SUBJECT_INDEX)
         functions.click_skills_by_name(
         page=page,
-        skills=functions.since3,
-        chapters=functions.chapters_since3,
+        skills=functions.farsi3,
+        chapters=functions.chapters_farsi3,
         start=0,
         #end=20,
         click_subject=(lambda p: functions.click_subject(p, SUBJECT, SUBJECT_INDEX)),
-        use_submit_test=True,
-        use_go_through_levels=False
+        use_submit_test=False,
+        use_go_through_levels=True
         )
 
 run()

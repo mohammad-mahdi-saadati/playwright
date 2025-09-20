@@ -1231,18 +1231,10 @@ def submit_in_skill(
 # ------------------------------
 
 def go_through_levels(page, skill_name: str, chapter: str, wait_time: int = 2000):
-    """
-    پیمایش سطح‌ها:
-    - اول میره عقب تا سطح ۱ یا پیام «سطح قبل وجود ندارد»
-    - بعد میره جلو تا پیام «سطح بعد وجود ندارد»
-    - همه‌ی خطاها/اسکرین‌شات‌ها با detect_and_report_bug ثبت میشن
-    """
-
     safe_skill = _sanitize_filename_part(skill_name)
     safe_chapter = _sanitize_filename_part(chapter)
 
     def get_current_level():
-        """خواندن شماره سطح با regex"""
         try:
             text = page.locator("text=/سطح/").nth(0).text_content()
             if text:
@@ -1254,47 +1246,48 @@ def go_through_levels(page, skill_name: str, chapter: str, wait_time: int = 2000
         return None
 
     def check_errors(stage: str):
-        """بررسی خطاهای احتمالی وسط پیمایش"""
-        tag = detect_and_report_bug(
+        return detect_and_report_bug(
             page,
             chapter,
             skill_name,
             stage=stage,
             require_submit_visible=False
         )
-        return tag
 
     try:
-        # 🔙 مرحله ۱: عقب رفتن تا وقتی "سطح 1" یا "سطح قبل وجود ندارد" دیده بشه
+        # 🔙 مرحله ۱: عقب رفتن تا وقتی پیام توقف دیده بشه
         while True:
-            current_level = get_current_level()
-            if current_level == 1 or page.locator("text=سطح قبل وجود ندارد").is_visible():
-                print("✅ رسیدیم به سطح ۱")
+            # پیام‌های مختلف توقف عقب‌گرد
+            if (
+                page.locator("text=سطح قبل وجود ندارد").is_visible()
+                or page.locator("text=سطح پایینتر وجود ندارد").is_visible()
+                or page.locator("text=سطح پایین تر وجود ندارد").is_visible()
+            ):
+                print("✅ رسیدیم به اولین سطح (پیام توقف دیده شد).")
                 break
 
             try:
                 if page.locator("text=سطح قبل").is_visible():
-                    prev_level = current_level
+                    prev_level = get_current_level()
                     page.click("text=سطح قبل")
                     page.wait_for_timeout(wait_time)
                     tag = check_errors("prev")
                     if tag:
                         print(f"⚠️ Error detected at prev level: {tag}")
                         return
-                    new_level = get_current_level()
-                    print(f"🔙 رفتیم از سطح {prev_level} به {new_level}")
+                    print(f"🔙 کلیک سطح قبل (سطح قبلی: {prev_level})")
                 else:
-                    print("⚠️ دکمه سطح قبل پیدا نشد، توقف.")
+                    print("❌ دکمه سطح قبل پیدا نشد.")
                     break
             except Exception as e:
                 print(f"⚠️ خطا در کلیک سطح قبل: {e}")
                 check_errors("prev_exception")
                 break
 
-        # 🔜 مرحله ۲: جلو رفتن تا وقتی پیام 'سطح بعد وجود ندارد' دیده بشه
+        # 🔜 مرحله ۲: جلو رفتن تا پیام توقف جلو
         while True:
-            if page.locator("text=سطح بعد وجود ندارد").is_visible():
-                print("✅ رسیدیم به آخرین سطح (پیام سطح بعد وجود ندارد دیده شد).")
+            if page.locator("text=سطح بالاتر وجود ندارد").is_visible():
+                print("✅ رسیدیم به آخرین سطح.")
                 break
 
             try:
@@ -1306,10 +1299,9 @@ def go_through_levels(page, skill_name: str, chapter: str, wait_time: int = 2000
                     if tag:
                         print(f"⚠️ Error detected at next level: {tag}")
                         return
-                    new_level = get_current_level()
-                    print(f"🔜 رفتیم از سطح {current_level} به {new_level}")
+                    print(f"🔜 کلیک سطح بعد (سطح قبلی: {current_level})")
                 else:
-                    print("❌ دکمه سطح بعد پیدا نشد، توقف.")
+                    print("❌ دکمه سطح بعد پیدا نشد.")
                     break
             except Exception as e:
                 print(f"❌ خطا در کلیک سطح بعد: {e}")
