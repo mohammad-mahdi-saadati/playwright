@@ -8,7 +8,7 @@ import re
 SITE_URL = "https://www.eduland.ir/auth/login"
 USERNAME = "danesh_t1"
 PASSWORD = "danesh_t1"
-SUBJECT = "فارسی"
+SUBJECT = "ریاضی"
 SUBJECT_INDEX = 3
 def run():
     with sync_playwright() as p:
@@ -17,8 +17,8 @@ def run():
         functions.click_subject(page, SUBJECT, SUBJECT_INDEX)
         functions.click_skills_by_name(
         page=page,
-        skills=functions.farsi3,
-        chapters=functions.chapters_farsi3,
+        skills=functions.skills_math3_chapter1,
+        chapters=functions.lessons_math3_chapter1,
         start=0,
         #end=20,
         click_subject=(lambda p: functions.click_subject(p, SUBJECT, SUBJECT_INDEX)),
