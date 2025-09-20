@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from playwright.sync_api import sync_playwright
-import t  
+import def
 import re
 # ------------------------------
 # مقادیر ورودی (قابل تغییر بیرون از تابع)
@@ -13,7 +13,7 @@ SUBJECT_INDEX = 3
 def run():
     with sync_playwright() as p:
         browser, context, page = t.open_site(p, SITE_URL)
-        t.login(page, USERNAME, PASSWORD)
+        def.login(page, USERNAME, PASSWORD)
         t.click_subject(page, SUBJECT, SUBJECT_INDEX)
         t.click_skills_by_name(
         page=page,
