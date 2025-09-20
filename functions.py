@@ -850,9 +850,7 @@ lessons_math6_chapter7 = [
     "درس 1","درس 1","درس 1","درس 1",
     # درس 2: 4 مهارت
     "درس 2","درس 2","درس 2","درس 2",]
-chapters_math3=[
-    "الگو‌ها","عددهای چهار رقمی","عددهای کسری","ضرب‌و‌تقسیم","محیط‌ومساحت","جمع‌وتفریق","آمار‌واحتمال","ضرب‌عددها"
-]
+
 # ------------------------------
 # 1. باز کردن سایت
 # ------------------------------
@@ -995,7 +993,7 @@ def click_subject(
         )
         return False
 
-# ------------------------------
+#  و خب پری------------------------------
 # 4. کلیک روی یک مهارت خاص
 # ------------------------------
 
@@ -1061,7 +1059,7 @@ def click_skills_by_name(
     + اگر درس ریاضی بود و subject_index و math_chapter_index داده شدند → فصل درست انتخاب می‌شود
     """
 
-    chapters_math3 = ["الگو‌ها","عددهای چهار رقمی","عددهای کسری","ضرب‌و‌تقسیم","محیط‌ومساحت","جمع‌وتفریق","آمار‌واحتمال","ضرب‌عددها"]
+    chapters_math3 = ["الگوها","عددهای چهار رقمی","عددهای کسری","ضرب‌و‌تقسیم","محیط‌ومساحت","جمع‌وتفریق","آمار‌واحتمال","ضرب‌عددها"]
     chapters_math4 = ["الگوها","کسر","ضرب و تقسیم","اندازه‌گیری","عدد مخلوط و عدد اعشاری","شکل‌های هندسی","آمار و احتمال"]
     chapters_math5 = ["عددنویسی‌ و الگوها","کسر","نسبت، تناسب و درصد","تقارن و چندضلعی‌ها","عددهای اعشاری","اندازه‌گیری","آمار و احتمال"]
     chapters_math6 = ["عدد و الگو‌های عددی","کسر","اعداد اعشاری","تقارن و مختصات","اندازه‌گیری","تناسب و درصد","تقریب",]
@@ -1098,28 +1096,23 @@ def click_skills_by_name(
             pass
 
     def select_math_chapter():
-        """اگر لیست فصل‌ها موجود بود و شماره فصل داده شد → انتخاب همان فصل"""
         if math_chapters and math_chapter_index is not None:
-            try:
-                if 0 <= math_chapter_index < len(math_chapters):
-                    chapter_name = math_chapters[math_chapter_index]
-                    print(f"📑 Selecting math chapter: {chapter_name}")
-                    chapter_button = page.get_by_role("button", name=chapter_name)
-                    if chapter_button.count() > 0:
-                        chapter_button.first.click()
-                        page.wait_for_timeout(1000)
-                    else:
-                        print(f"⚠️ Chapter button '{chapter_name}' not found!")
-                else:
-                    print(f"⚠️ math_chapter_index {math_chapter_index} is out of range for selected grade")
-            except Exception as e:
-                print(f"⚠️ Could not select math chapter: {e}")
+            chapter_name = math_chapters[math_chapter_index].strip()
+            print(f"📑 Selecting math chapter: {chapter_name}")
+            chapter_button = page.locator(f"text={chapter_name}")  # تغییر اصلی
+            if chapter_button.count() > 0:
+                chapter_button.first.click()
+                page.wait_for_timeout(1000)
+            else:
+                print(f"⚠️ Chapter button '{chapter_name}' not found!")
+                (f"⚠️ Could not select math chapter: {e}")
 
     i = start
+    if math_chapters:  # فقط اگر ریاضی بود
+            select_math_chapter()
     while i < end:
         ensure_subject_is_open()
-        if math_chapters:  # فقط اگر ریاضی بود
-            select_math_chapter()
+        
 
         skill = skills[i]
         chapter = chapters[i]
@@ -1130,9 +1123,17 @@ def click_skills_by_name(
 
             print(f"\n🔹 Trying skill {i+1}/{len(skills)}: {skill} (nth={nth_index}, chapter={chapter})")
 
-            links = page.get_by_role("link", name=skill)
-            cards = page.locator(".v-card", has_text=skill)
-            target = links if links.count() > 0 else cards
+            # چند حالت مختلف برای پیدا کردن مهارت
+            target = None
+            if page.get_by_role("link", name=skill).count() > 0:
+                target = page.get_by_role("link", name=skill)
+            elif page.get_by_role("button", name=skill).count() > 0:
+                target = page.get_by_role("button", name=skill)
+            elif page.locator(".v-card", has_text=skill).count() > 0:
+                target = page.locator(".v-card", has_text=skill)
+            elif page.locator(f"text={skill}").count() > 0:
+                target = page.locator(f"text={skill}")
+
 
             page.wait_for_timeout(300)
             count = target.count()
