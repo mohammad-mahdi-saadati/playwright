@@ -40,7 +40,7 @@ chapters_since4 = [
 since5 = [
     "مراحل تحقیق علمی","تغییرات  فیزیکی و شیمیایی","سرعت تغییرات و رابطه‌اش با ما",
     "تجزیه نور","عدسی‌ها","انواع فسیل و تشکیل آن","رمزگشایی فسیل‌ها","ماهیچه‌ها و اسکلت",
-    "مفز و نخاع","دیدن","حفظ سلامت چشم و گوش","چشیدن و بوییدن","لمس کردن","اهرم چیست؟",
+    "مغز و نخاع","دیدن","حفظ سلامت چشم و گوش","چشیدن و بوییدن","لمس کردن","اهرم چیست؟",
     "کاربرد اهرم‌ها","سطح شیب دار و گُوِه","پیچ، قرقره و چرخ و محور","تشکیل خاک",
     "انواع خاک و فرسایش خاک","اثر آب بر رشد گیاه","اثر خاک، هوا و نور بر رشد گیاه",
     "از خاک تا ریشه","ساقه و برگ"
@@ -69,15 +69,15 @@ chapters_since6 = [
     "فصل 14","فصل 14 "]
 farsi3 = [
     # درس 1: محله ما
-    "هم‌معنی","مخالف","جمع و مفرد","معنی شعر","حفظ شعر",
+    "هم‌معنی","مخالف","هم‌خانواده","جمع و مفرد","معنی شعر","حفظ شعر","دانش زبانی","واژه‌آموزی","املا","درک مطلب","انواع جمله","علائم نگارشی",
     # درس 2: زنگ ورزش
-    "هم‌معنی","مخالف","هم‌خانواده","جمع و مفرد",
+    "هم‌معنی","مخالف","هم‌خانواده","جمع و مفرد","ضرب المثل","دانش زبانی","واژه‌آموزی","املا","درک مطلب","انواع جمله","علائم نگارشی",
     # درس 3: آسمان آبی، طبیعت پاک
-    "هم‌معنی","مخالف","هم‌خانواده","ضرب المثل","معنی شعر","حفظ شعر",
+    "هم‌معنی","مخالف","هم‌خانواده","جمع و مفرد","معنی شعر","حفظ شعر","دانش زبانی","واژه‌آموزی","املا","درک مطلب","انواع جمله","علائم نگارشی",
     # درس 4: آواز گنجشک
-    "هم‌معنی","مخالف","هم‌خانواده","جمع و مفرد","ضرب المثل",
+    "هم‌معنی","مخالف","هم‌خانواده","جمع و مفرد","ضرب المثل","دانش زبانی","واژه‌آموزی","املا","درک مطلب","انواع جمله","علائم نگارشی",
     # درس 5: بلدرچین و برزگر
-    "هم‌معنی","مخالف","هم‌خانواده","جمع و مفرد","ضرب المثل",
+    "هم‌معنی","مخالف","هم‌خانواده","جمع و مفرد","ضرب المثل","دانش زبانی","واژه‌آموزی","املا","درک مطلب","انواع جمله","علائم نگارشی",
     # درس 6: فداکاران
     "هم‌معنی","مخالف","هم‌خانواده","جمع و مفرد","ضرب المثل","معنی شعر","حفظ شعر",
     # درس 7: کار نیک
@@ -1049,6 +1049,7 @@ def click_skills_by_name(
     click_subject=None,
     use_submit_test: bool = False,
     use_go_through_levels: bool = False,
+    use_solve_all_level:bool=False,
     math_chapter_index: int = None,  # شماره فصل ریاضی (مثلاً 0 تا 7)
     subject_index: int = None        # 👈 3=ریاضی سوم، 4=ریاضی چهارم، ...
 ):
@@ -1186,7 +1187,8 @@ def click_skills_by_name(
 
             if use_go_through_levels:
                 go_through_levels(page, skill, chapter)
-
+            if use_solve_all_level:
+                solve_all_levels(page, skill, chapter)
             page.go_back()
             page.wait_for_timeout(2000)
             ensure_subject_is_open()
@@ -1472,6 +1474,20 @@ def detect_and_report_bug(
             tag = "not_loaded"
             if verbose: print("⚠️ submit button check raised exception → not_loaded")
 
+    # --- چک 6: خطاهای اعتبارسنجی فقط در مرحله open_site ---
+    if not tag and stage == "after_submit":
+        try:
+            if (
+                page.locator("text=خطا در ارسال اطلاعات").is_visible()
+                or page.locator("text=با زبان انگلیسی وارد کنید").is_visible()
+                or page.locator("text=نام کاربری نباید شامل فاصله باشد").is_visible()
+                or page.locator("text=رمز نباید شامل فاصله باشد").is_visible()
+            ):
+                tag = "input_validation_error"
+                if verbose: print("⚠️ Detected input validation error at open_site stage")
+        except Exception:
+            pass
+
     # --- اگر باگی پیدا شد ---
     if tag:
         ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -1501,7 +1517,8 @@ def detect_and_report_bug(
                 "receive_error": "❌ Detected 'خطا در دریافت سوال'.",
                 "general_error": "❌ Detected general error (مشکلی پیش اومده).",
                 "parse_error": "❌ Detected parse/JS error in page source.",
-                "not_loaded": "❌ Skill page not loaded (submit button not visible)."
+                "not_loaded": "❌ Skill page not loaded (submit button not visible).",
+                "input_validation_error": "❌ Detected input validation error at login/open_site."
             }
             print(messages.get(tag, f"❌ Detected bug: {tag}"))
 
@@ -1515,3 +1532,147 @@ def detect_and_report_bug(
 
     if verbose: print("✅ No bug detected.")
     return None
+
+# ------------------------------
+# 9.تست کردن  سوال  و پاسخ همه مهارت ها 
+# ------------------------------
+def solve_all_levels(
+    page,
+    skill_name: str,
+    chapter: str,
+    wait_time: int = 2000,
+    repeat_per_level: int = 1,
+    on_fail_callback=None,
+):
+    """
+    ترکیب go_through_levels و submit_in_skill:
+    - رفتن به پایین‌ترین سطح
+    - در هر سطح → ارسال پاسخ، تایید، گرفتم
+      اگر سطحی عقب افتاد → دوبار سطح بعد می‌زنیم تا جبران شود
+    - رفتن تا آخرین سطح
+    """
+
+    safe_skill = _sanitize_filename_part(skill_name)
+    safe_chapter = _sanitize_filename_part(chapter)
+
+    def check_errors(stage: str):
+        return detect_and_report_bug(
+            page,
+            chapter,
+            skill_name,
+            stage=stage,
+            require_submit_visible=False
+        )
+
+    def click_next_level(times=1):
+        """کلیک روی دکمه سطح بعد به تعداد مشخص"""
+        for t in range(times):
+            if page.locator("text=سطح بعد").is_visible():
+                page.click("text=سطح بعد")
+                page.wait_for_timeout(wait_time)
+                tag = check_errors(f"next_{t}")
+                if tag:
+                    print(f"⚠️ Error detected at next level click {t}: {tag}")
+                    return False
+                print(f"🔜 کلیک سطح بعد (بار {t+1}/{times})")
+            else:
+                print("❌ دکمه سطح بعد پیدا نشد.")
+                return False
+        return True
+
+    # مرحله ۱: عقب رفتن تا پایین‌ترین سطح
+    while True:
+        if (
+            page.locator("text=سطح قبل وجود ندارد").is_visible()
+            or page.locator("text=سطح پایینتر وجود ندارد").is_visible()
+            or page.locator("text=سطح پایین تر وجود ندارد").is_visible()
+        ):
+            print("✅ رسیدیم به اولین سطح (پیام توقف دیده شد).")
+            break
+
+        try:
+            if page.locator("text=سطح قبل").is_visible():
+                page.click("text=سطح قبل")
+                page.wait_for_timeout(wait_time)
+                tag = check_errors("prev")
+                if tag:
+                    print(f"⚠️ Error detected at prev level: {tag}")
+                    return
+                print("🔙 کلیک سطح قبل")
+            else:
+                print("❌ دکمه سطح قبل پیدا نشد.")
+                break
+        except Exception as e:
+            print(f"⚠️ خطا در کلیک سطح قبل: {e}")
+            check_errors("prev_exception")
+            break
+
+    # مرحله ۲: جلو رفتن تا آخرین سطح و حل هر سطح
+    while True:
+        for attempt in range(1, repeat_per_level + 1):
+            print(f"🔁 Attempt {attempt}/{repeat_per_level} for {skill_name} in {chapter}")
+            try:
+                # چک کنیم آیا این پایین‌ترین سطح است
+                at_first_level = (
+                    page.locator("text=سطح قبل وجود ندارد").is_visible()
+                    or page.locator("text=سطح پایینتر وجود ندارد").is_visible()
+                    or page.locator("text=سطح پایین تر وجود ندارد").is_visible()
+                )
+
+                try:
+                    page.wait_for_selector("text=ارسال پاسخ", timeout=4000)
+                    page.click("text=ارسال پاسخ")
+                    page.wait_for_timeout(800)
+                except Exception:
+                    print("❌ ارسال پاسخ پیدا نشد.")
+                    tag = detect_and_report_bug(
+                        page,
+                        chapter,
+                        skill_name,
+                        stage=f"try{attempt}",
+                        require_submit_visible=True
+                    )
+                    if on_fail_callback:
+                        on_fail_callback(page, tag or "submit_not_found")
+                    return
+
+                tag = check_errors(f"try{attempt}")
+                if tag:
+                    if on_fail_callback:
+                        on_fail_callback(page, tag)
+                    return
+
+                if page.locator("text=تایید").is_visible():
+                    page.click("text=تایید")
+                    page.wait_for_timeout(wait_time)
+                else:
+                    print("ℹ️ 'تایید' button not present, skipping...")
+
+                try:
+                    page.wait_for_selector("text=گرفتم", timeout=2000)
+                    page.click("text=گرفتم")
+                    page.wait_for_timeout(wait_time)
+                except:
+                    print("⚠️ 'گرفتم' button not found, continuing...")
+
+                # بعد از ارسال → برو سطح بعد (یک یا دوبار بسته به سطح)
+                times_to_click = 1 if at_first_level else 2
+                if not click_next_level(times_to_click):
+                    return
+
+            except Exception as e:
+                print(f"❌ Unexpected exception at attempt {attempt}: {e}")
+                tag = detect_and_report_bug(
+                    page,
+                    chapter,
+                    skill_name,
+                    stage=f"try{attempt}_exception",
+                    require_submit_visible=True
+                )
+                if on_fail_callback:
+                    on_fail_callback(page, tag or "exception")
+                return
+
+        if page.locator("text=سطح بالاتر وجود ندارد").is_visible():
+            print("✅ رسیدیم به آخرین سطح.")
+            break
