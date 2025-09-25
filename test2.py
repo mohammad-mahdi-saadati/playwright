@@ -1,9 +1,12 @@
+import pandas as pd
 from playwright.sync_api import sync_playwright
 import functions
 
 def test_multiple_accounts(p, creds):
     SITE_URL = "https://www.eduland.ir/auth/login"
+
     browser, context, page = functions.open_site(p, SITE_URL)
+
     for username, password in creds:
         print(f"\n🔁 تست یوزر: {username}")
         try:
@@ -42,17 +45,15 @@ def test_multiple_accounts(p, creds):
                     skill="login_check",
                     stage=f"{username}_click_error"
                 )
-            # 3) خروج برای آماده شدن یوزر بعدی
-            try:
-                # کلیک روی دکمه خروج
-                logout_btn = page.locator("button:has-text('خروج از حساب')")
-                logout_btn.wait_for(state="visible", timeout=2000)
-                logout_btn.click()
-                print("👉 کلیک روی دکمه خروج از حساب")
 
-                # کلیک روی دکمه مطمئنم!
-                confirm_btn = page.locator("span:has-text('مطمئنم!')")
-                confirm_btn.wait_for(state="visible", timeout=2000)
+            # 3) خروج
+            try:
+                logout_btn = page.locator("button:has-text('خروج از حساب')")
+                logout_btn.wait_for(state="visible", timeout=5000)
+                logout_btn.click()
+                print("👉 کلیک روی دکمه خروج")
+                confirm_btn = page.get_by_text("مطمئنم!")
+                confirm_btn.wait_for(state="visible", timeout=5000)
                 confirm_btn.click()
                 print("🔒 خروج کامل شد")
 
@@ -61,14 +62,14 @@ def test_multiple_accounts(p, creds):
             except Exception as e:
                 print(f"❌ خطا در خروج: {e}")
 
-            # بعد از خروج دوباره به صفحه لاگین برگرده
+            # برگشت به صفحه لاگین برای یوزر بعدی
             page.goto(SITE_URL)
             page.wait_for_load_state("domcontentloaded")
 
         except Exception as e:
             print(f"❌ خطا برای {username}: {e}")
 
-    # در آخر فقط یکبار مرورگر بسته بشه
+    # آخر کار مرورگر بسته بشه
     context.close()
     browser.close()
 
@@ -77,9 +78,10 @@ def test_multiple_accounts(p, creds):
 # استفاده
 # ------------------------
 if __name__ == "__main__":
-    credentials = [
-        ("danesh_s1", "danesh_s1"),
-        ("user2", "pass2"),
-    ]
+    
+    df = pd.read_excel("accounts.xlsx")
+
+    credentials = list(zip(df["username"], df["password"]))
+
     with sync_playwright() as p:
         test_multiple_accounts(p, credentials)
