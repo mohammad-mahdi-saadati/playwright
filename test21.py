@@ -1,6 +1,7 @@
 import os, re, datetime
 from typing import List, Tuple
 from playwright.sync_api import sync_playwright
+import pandas as pd
 
 
 def detect_and_report_bug(page, stage: str = "", verbose: bool = True) -> str | None:
@@ -76,9 +77,7 @@ def safe_click_text(page, text: str, timeout: int = 5000) -> bool:
         locator = page.locator(f"text={text}")
         if locator.count() == 0:
             return False
-        # کلیک روی اولین المان قابل کلیک
         locator.first.click()
-        # اجازه بارگذاری
         page.wait_for_timeout(1000)
         return True
     except Exception as e:
@@ -100,7 +99,7 @@ def test_multiple_accounts(p, creds: List[Tuple[str, str]]):
             # 1) لاگین
             login(page, username=username, password=password)
 
-            # 2)  ترتیب: درس -> تکالیف -> (در آخر) حساب کاربری
+            # 2) ترتیب: درس -> تکالیف -> (در آخر) حساب کاربری
             pre_account_buttons = ["درس", "تکالیف"]
             for btn in pre_account_buttons:
                 clicked = safe_click_text(page, btn)
@@ -108,73 +107,60 @@ def test_multiple_accounts(p, creds: List[Tuple[str, str]]):
                     print(f"👉 وارد شدیم: {btn}")
                     page.wait_for_timeout(1000)
                     try:
-
                         page.go_back()
                         page.wait_for_load_state("domcontentloaded")
                     except Exception:
-
                         pass
                 else:
                     print(f"❌ دکمه '{btn}' پیدا یا قابل کلیک نبود.")
 
-            # 3) در نهایت حتماً روی "حساب کاربری" کلیک کن
+            # 3) حساب کاربری
             got_account = safe_click_text(page, "حساب کاربری")
             if got_account:
                 print(f"✅ وارد بخش حساب کاربری شدیم: {username}")
             else:
                 print(f"❌ نتوانستم وارد حساب کاربری شوم: {username}")
 
-            # 4) خروج (درون حساب کاربری)
+            # 4) خروج
             try:
                 logout_btn = page.locator("button:has-text('خروج از حساب')")
                 logout_btn.wait_for(state="visible", timeout=5000)
                 logout_btn.click()
                 print("👉 کلیک روی دکمه خروج")
-                # اگر دیالوگ تأیید دارد:
                 try:
                     confirm_btn = page.get_by_text("مطمئنم!")
                     confirm_btn.wait_for(state="visible", timeout=5000)
                     confirm_btn.click()
                     print("🔒 خروج کامل شد")
                 except Exception:
-                    # اگر تأیید وجود نداشت، نادیده بگیر
                     pass
-
                 page.wait_for_timeout(1000)
-
             except Exception as e:
                 print(f"❌ خطا در خروج: {e}")
 
-            # برگشت به صفحه لاگین برای یوزر بعدی
+            # بازگشت به صفحه لاگین
             page.goto(SITE_URL)
             page.wait_for_load_state("domcontentloaded")
 
         except Exception as e:
             print(f"❌ خطا برای {username}: {e}")
-            # اگر خطا رخ داد سعی می‌کنیم صفحه لاگین را مجدداً باز کنیم
             try:
                 page.goto(SITE_URL)
                 page.wait_for_load_state("domcontentloaded")
             except Exception:
                 pass
 
-    # آخر کار مرورگر بسته بشه
     context.close()
     browser.close()
 
 
 # ------------------------
-# اجرا (لیست مثال)
+# اجرا (خواندن از اکسل)
 # ------------------------
 if __name__ == "__main__":
-    # لیست ساده از (یوزر, پسورد)
-    credentials = [
-        ("danesh_s1", "danesh_s1"),
-        ("ugf", "pas s2"),
-        ("یسبفبلاتناتلابلیب", "pass3"),
-        ("danesh_s2", "danesh_s2"),
-    ]
+    # فایل اکسل باید ستون‌های username و password داشته باشد
+    df = pd.read_excel("accounts.xlsx")
+    credentials = list(zip(df["username"], df["password"]))
 
     with sync_playwright() as p:
         test_multiple_accounts(p, credentials)
-زیاد
