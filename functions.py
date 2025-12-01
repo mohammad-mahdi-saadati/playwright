@@ -5,6 +5,7 @@ import os
 import re
 import datetime
 from typing import Callable, Optional
+import random
 
 since3 = [
     "مراحل تحقیق علمی","گروه‌های مواد غذایی","برچسب مواد غذایی","کاربرد گازها",
@@ -1031,8 +1032,7 @@ def login(page, username: str = "danesh_t1", password: str = "danesh_t1"):
 def click_subject(
     page,
     subject: str,
-    subject_index: int,
-    *,
+    subject_index: int,*,
     screenshot_prefix: str | None = None,
     wait_after_click: int = 3000,
     verbose: bool = True
@@ -1042,18 +1042,18 @@ def click_subject(
     برمی‌گرداند True اگر موفق بود، False اگر خطا رخ داد.
     """
 
-    # مپ اصلاح subject_index (بعضی درس‌ها جابجا می‌شوند)
-    mapping = {3:1 , 4: 1, 5: 2, 6: 3}
-    subject_index = mapping.get(subject_index, subject_index)
-
     try:
+        # رفتن به صفحه کلاس‌ها
         page.click("text=کلاس‌ها")
         page.wait_for_timeout(3000)
+
         if verbose:
             print(f"\n🔹 Trying to click {subject} number {subject_index} ...")
 
+        # کلیک روی nامین دکمه درس موردنظر
         buttons = page.locator(f"button:has-text('{subject}')")
         buttons.nth(subject_index - 1).click()
+
         if verbose:
             print(f"✅ Clicked {subject} number {subject_index}")
 
@@ -1138,23 +1138,21 @@ def click_skills_by_name(
     click_subject=None,
     use_submit_test: bool = False,
     use_go_through_levels: bool = False,
-    use_solve_all_level:bool=False,
-    math_chapter_index: int = None,  # شماره فصل ریاضی (مثلاً 0 تا 7)
-    subject_index: int = None        # 👈 3=ریاضی سوم، 4=ریاضی چهارم، ...
+    use_solve_all_level: bool = False,
+    use_solve_science_questions: bool = False,
+    math_chapter_index: int = None,
+    subject_index: int = None
 ):
-    """
-    کلیک روی مهارت‌ها بر اساس دو لیست موازی (skills, chapters)
-    + قبل از شروع → همه فلش‌های بازکننده فصل‌ها کلیک می‌شوند
-    + اگر به صفحه کلاس‌ها یا تکالیف برگشت → دوباره click_subject اجرا می‌شود
-    + اگر درس ریاضی بود و subject_index و math_chapter_index داده شدند → فصل درست انتخاب می‌شود
-    """
 
-    chapters_math3 = ["الگوها","عددهای چهار رقمی","عددهای کسری","ضرب‌و‌تقسیم","محیط‌ومساحت","جمع‌وتفریق","آمار‌واحتمال","ضرب‌عددها"]
-    chapters_math4 = ["الگوها","کسر","ضرب و تقسیم","اندازه‌گیری","عدد مخلوط و عدد اعشاری","شکل‌های هندسی","آمار و احتمال"]
-    chapters_math5 = ["عددنویسی‌ و الگوها","کسر","نسبت، تناسب و درصد","تقارن و چندضلعی‌ها","عددهای اعشاری","اندازه‌گیری","آمار و احتمال"]
-    chapters_math6 = ["عدد و الگو‌های عددی","کسر","اعداد اعشاری","تقارن و مختصات","اندازه‌گیری","تناسب و درصد","تقریب",]
+    chapters_math3 = ["الگوها","عددهای چهار رقمی","عددهای کسری","ضرب‌و‌تقسیم","محیط‌ومساحت",
+                      "جمع‌وتفریق","آمار‌واحتمال","ضرب‌عددها"]
+    chapters_math4 = ["الگوها","کسر","ضرب و تقسیم","اندازه‌گیری","عدد مخلوط و عدد اعشاری",
+                      "شکل‌های هندسی","آمار و احتمال"]
+    chapters_math5 = ["عددنویسی‌ و الگوها","کسر","نسبت، تناسب و درصد","تقارن و چندضلعی‌ها",
+                      "عددهای اعشاری","اندازه‌گیری","آمار و احتمال"]
+    chapters_math6 = ["عدد و الگو‌های عددی","کسر","اعداد اعشاری","تقارن و مختصات",
+                      "اندازه‌گیری","تناسب و درصد","تقریب"]
 
-    # انتخاب لیست بر اساس subject_index
     math_chapters = None
     if subject_index == 3:
         math_chapters = chapters_math3
@@ -1170,10 +1168,15 @@ def click_skills_by_name(
     if end is None or end > len(skills):
         end = len(skills)
 
-    seen_counts = {}
+    # -------------------------------------------------------------------
+    # 1) PRE-COUNTING — Count repetitions of skills before "start"
+    # -------------------------------------------------------------------
+    pre_counts = {}
+    for idx in range(start):
+        s = skills[idx]
+        pre_counts[s] = pre_counts.get(s, 0) + 1
 
     def ensure_subject_is_open():
-        """بررسی می‌کند اگر به صفحه کلاس‌ها برگشت دوباره وارد درس شود"""
         try:
             if (page.locator("text=کلاس‌های من").is_visible() or 
                 page.locator("text=گزارش تکالیف").is_visible() or 
@@ -1189,31 +1192,37 @@ def click_skills_by_name(
         if math_chapters and math_chapter_index is not None:
             chapter_name = math_chapters[math_chapter_index].strip()
             print(f"📑 Selecting math chapter: {chapter_name}")
-            chapter_button = page.locator(f"text={chapter_name}")  # تغییر اصلی
-            if chapter_button.count() > 0:
-                chapter_button.first.click()
+            btn = page.locator(f"text={chapter_name}")
+            if btn.count() > 0:
+                btn.first.click()
                 page.wait_for_timeout(1000)
             else:
-                print(f"⚠️ Chapter button '{chapter_name}' not found!")
-                (f"⚠️ Could not select math chapter: {e}")
+                print(f"⚠️ Chapter '{chapter_name}' not found!")
 
+    # انتخاب فصل ریاضی
+    if math_chapters:
+        select_math_chapter()
+
+    # -------------------------------------------------------------------
+    # MAIN LOOP
+    # -------------------------------------------------------------------
     i = start
-    if math_chapters:  # فقط اگر ریاضی بود
-            select_math_chapter()
     while i < end:
         ensure_subject_is_open()
-        
 
         skill = skills[i]
         chapter = chapters[i]
-        
+
+        # ----------------------------------------
+        # nth occurrence based on pre-counted list
+        # ----------------------------------------
+        nth_index = pre_counts.get(skill, 0)
+        pre_counts[skill] = nth_index + 1
+
+        print(f"\n🔹 Skill {i+1}/{len(skills)} → {skill} (occurrence #{nth_index})")
+
         try:
-            nth_index = seen_counts.get(skill, 0)
-            seen_counts[skill] = nth_index + 1
-
-            print(f"\n🔹 Trying skill {i+1}/{len(skills)}: {skill} (nth={nth_index}, chapter={chapter})")
-
-            # چند حالت مختلف برای پیدا کردن مهارت
+            # Try multiple locator methods
             target = None
             if page.get_by_role("link", name=skill).count() > 0:
                 target = page.get_by_role("link", name=skill)
@@ -1221,18 +1230,17 @@ def click_skills_by_name(
                 target = page.get_by_role("button", name=skill)
             elif page.locator(".v-card", has_text=skill).count() > 0:
                 target = page.locator(".v-card", has_text=skill)
-            elif page.locator(f"text={skill}").count() > 0:
+            else:
                 target = page.locator(f"text={skill}")
 
-
             page.wait_for_timeout(300)
-            count = target.count()
 
+            count = target.count()
             if count == 0:
-                print(f"⚠️ Skill '{skill}' not visible, start scrolling...")
+                print(f"⚠️ Skill '{skill}' not visible → scrolling...")
                 last_height = 0
                 while True:
-                    page.mouse.wheel(0, 400)
+                    page.mouse.wheel(0, 600)
                     page.wait_for_timeout(800)
                     ensure_subject_is_open()
 
@@ -1242,48 +1250,54 @@ def click_skills_by_name(
                     count = target.count()
 
                     if count > 0:
-                        print(f"✅ Found {count} occurrence(s) of '{skill}' after scrolling.")
+                        print(f"✅ Found {count} items of '{skill}' after scrolling")
                         break
 
                     new_height = page.evaluate("() => document.body.scrollHeight")
-                    scroll_position = page.evaluate("() => window.scrollY + window.innerHeight")
+                    scroll_pos = page.evaluate("() => window.scrollY + window.innerHeight")
 
-                    if scroll_position >= new_height or new_height == last_height:
+                    if scroll_pos >= new_height or new_height == last_height:
                         print(f"❌ Skill '{skill}' not found after scrolling.")
                         raise Exception(f"Skill '{skill}' not found")
 
                     last_height = new_height
 
+            # ----------------------------------------
+            # CLICK EXACT occurrence based on nth_index
+            # ----------------------------------------
             index_to_click = nth_index if nth_index < count else count - 1
-            print(f"👉 Clicking {skill} [occurrence {index_to_click}]")
+
+            print(f"👉 Clicking occurrence {index_to_click} of skill '{skill}'")
             target.nth(index_to_click).scroll_into_view_if_needed()
             target.nth(index_to_click).click()
+
             page.wait_for_timeout(wait_time)
 
             submit_button = page.locator("button:has-text('ارسال پاسخ')")
             if not submit_button.is_visible():
-                raise Exception("⛔ مهارت باز نشد یا صفحه سؤال لود نشد (ارسال پاسخ دیده نشد)")
+                raise Exception("❌ مهارت باز نشد (ارسال پاسخ دیده نشد)")
 
             if page.locator("text=خطا در دریافت سوال").is_visible():
-                print("⚠️ خطا در دریافت سوال دیده شد → بازگشت به صفحه مهارت‌ها و ادامه...")
+                print("⚠️ Error receiving question → skipping...")
                 detect_and_report_bug(page, chapter, skill, stage="receive_error")
-                ensure_subject_is_open()
                 i += 1
                 continue
 
             if use_submit_test:
                 submit_in_skill(page, skill, chapter)
-
             if use_go_through_levels:
                 go_through_levels(page, skill, chapter)
             if use_solve_all_level:
                 solve_all_levels(page, skill, chapter)
+            if   use_solve_science_questions:
+                solve_science_questions(page, skill, chapter)
+
             page.go_back()
             page.wait_for_timeout(2000)
             ensure_subject_is_open()
 
         except Exception as e:
-            print(f"❌ Could not open skill {skill}: {str(e)}")
+            print(f"❌ Could not open skill '{skill}': {e}")
             detect_and_report_bug(page, chapter, skill, stage="exception")
             page.go_back()
             page.wait_for_timeout(2000)
@@ -1765,3 +1779,80 @@ def solve_all_levels(
         if page.locator("text=سطح بالاتر وجود ندارد").is_visible():
             print("✅ رسیدیم به آخرین سطح.")
             break
+
+
+
+def solve_science_questions(
+    page,
+    skill_name: str,
+    chapter: str,
+    wait_time: int = 1500,
+    on_fail_callback=None,
+):
+
+    safe_skill = _sanitize_filename_part(skill_name)
+    safe_chapter = _sanitize_filename_part(chapter)
+
+    def check_errors(stage: str):
+        return detect_and_report_bug(
+            page,
+            chapter,
+            skill_name,
+            stage=stage,
+            require_submit_visible=False
+        )
+
+
+    for i in range(15):
+        try:
+            try:
+                page.wait_for_selector("text=ارسال پاسخ", timeout=3000)
+                page.click("text=ارسال پاسخ")
+                page.wait_for_timeout(700)
+            except:
+                print("❌ ارسال پاسخ پیدا نشد.")
+                tag = detect_and_report_bug(
+                    page,
+                    chapter,
+                    skill_name,
+                    stage="submit",
+                    require_submit_visible=True
+                )
+                if on_fail_callback:
+                    on_fail_callback(page, tag or "submit_not_found")
+                return
+
+            tag = check_errors("submit")
+            if tag:
+                if on_fail_callback:
+                    on_fail_callback(page, tag)
+                return
+
+            if page.locator("text=تایید").is_visible():
+                page.click("text=تایید")
+                page.wait_for_timeout(wait_time)
+            else:
+                print("ℹ️ 'تایید' وجود نداشت .")
+            try:
+                page.wait_for_selector("text=گرفتم", timeout=3000)
+                page.click("text=گرفتم")
+                page.wait_for_timeout(wait_time)
+            except:
+                print("⚠️ 'گرفتم' دیده نشد.")
+
+            # ---------------------------------------
+            # 🔁 ادامه چرخه (بدون سطح بعد)
+            # ---------------------------------------
+
+        except Exception as e:
+            print(f"❌ خطای غیرمنتظره: {e}")
+            tag = detect_and_report_bug(
+                page,
+                chapter,
+                skill_name,
+                stage="exception",
+                require_submit_visible=True
+            )
+            if on_fail_callback:
+                on_fail_callback(page, tag or "exception")
+            return

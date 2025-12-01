@@ -5,11 +5,11 @@ import re
 # ------------------------------
 # مقادیر ورودی (قابل تغییر بیرون از تابع)
 # ------------------------------
-SITE_URL = "https://danio.ir/auth/login"
-USERNAME = "danesh.t5"
-PASSWORD = "1111"
-SUBJECT = "فارسی"
-SUBJECT_INDEX = 5
+SITE_URL = "https://www.eduland.ir/teacher"
+USERNAME = "danesh_t1"
+PASSWORD = "danesh_t1"
+SUBJECT = "علوم"
+SUBJECT_INDEX = 2
 def run():
     with sync_playwright() as p:
         browser, context, page = functions.open_site(p, SITE_URL)
@@ -17,16 +17,15 @@ def run():
         functions.click_subject(page, SUBJECT, SUBJECT_INDEX)
         functions.click_skills_by_name(
         page=page,
-        skills=functions.farsi5,
-        chapters=functions.chapters_farsi5,
-        start=20,
-        end=40,
+        skills=functions.since5,
+        chapters=functions.chapters_since5,
+        start=00,    
+        end=30,
         click_subject=(lambda p: functions.click_subject(p, SUBJECT, SUBJECT_INDEX)),
         use_submit_test=False,
-        use_go_through_levels=True,
-        use_solve_all_level=False
-        #subject_index= 3,
-        #math_chapter_index=0 
+        use_go_through_levels=False,
+        use_solve_all_level=False,
+        use_solve_science_questions=True
         )
 
 run()
