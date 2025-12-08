@@ -2,9 +2,6 @@
 from playwright.sync_api import sync_playwright
 import functions
 import re
-# ------------------------------
-# مقادیر ورودی (قابل تغییر بیرون از تابع)
-# ------------------------------
 SITE_URL = "https://www.eduland.ir/teacher"
 USERNAME = "danesh_t1"
 PASSWORD = "danesh_t1"
