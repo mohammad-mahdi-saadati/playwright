@@ -1,21 +1,26 @@
-from playwright.sync_api import sync_playwright as p
-
-def login(page, username: str = "demo.t1", password: str = "demo.t1"):
+def run(page):
     try:
-        page.click("text=ورود")
-        page.fill('input[name="username"]', username)
-        page.fill('input[name="password"]', password)
+        page.click("text=ورود", timeout=5000)
+        page.wait_for_selector('input[name="username"]', timeout=5000)
+        page.fill('input[name="username"]', "demo.s1")
+        page.fill('input[name="password"]', "1111")
         page.click('button[type="submit"]')
         page.wait_for_timeout(2000)
-
-        print(f"✅ Logged in as {username}")
+        required_buttons = ["خانه", "حساب کاربری", "آزمون", "تکلیف", "کلاس", "عملکرد"]
+        all_visible = True
+        for btn_text in required_buttons:
+            if not page.is_visible(f"text={btn_text}"):
+                all_visible = False
+                missing_btn = btn_text
+                break
+        if all_visible:
+            return {"name": "login_buttons_check", "success": True}
+        else:
+            return {
+                "name": "login_buttons_check",
+                "success": False,
+                "error": f"دکمه '{missing_btn}' بعد از ورود دیده نشد"
+            }
 
     except Exception as e:
-        print(f"❌ Login failed: {str(e)}")
-        raise
-def run(page):
-    page.fill('input[name="username"]', "user")
-    page.fill('input[name="password"]', "pass")
-    page.click('button[type="submit"]')
-    page.wait_for_timeout(1500)
-    return {"name": "login", "status": "passed"}
+        return {"name": "login_buttons_check", "success": False, "error": str(e)}

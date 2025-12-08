@@ -12,6 +12,8 @@ class BrowserManager:
         self.browser = self.p.chromium.launch(headless=False, devtools=True)
         self.context = self.browser.new_context()
         self.page = self.context.new_page()
+        client = self.context.new_cdp_session(self.page)
+        client.send("Runtime.evaluate", {"expression": "window.focus();"})
         return self.page
 
     def stop(self):
