@@ -4,6 +4,7 @@ from core.reporter import generate_report
 # لیست تمام تست‌ها
 import tests_site.open_site as open_site
 import tests_site.login as login 
+import tests_site.quiz as quiz
 import tests_site.homework as homework
 import tests_site.homework_current_literature as homework_current_literature
 import tests_site.homework_current_science as homework_current_science
@@ -14,10 +15,14 @@ import tests_site.homework_past_math as homework_past_math
 import tests_site.homework_future_literature as homework_future_literature
 import tests_site.homework_future_science as homework_future_science
 import tests_site.homework_future_math as homework_future_math
-tests_list = [open_site, login, homework,
+import tests_site.poshtibany as poshtibany
+import tests_site.learning_to_homeworks as learning_to_homeworks
+import tests_site.learning_to_study as learning_to_study
+tests_list = [open_site, login,quiz, homework,
 homework_current_literature,homework_current_science,homework_current_math,
-homework_past_literature,homework_past_science,homework_past_math,
-homework_future_literature,homework_future_science,homework_future_math]
+#homework_past_literature,homework_past_science,homework_past_math,
+#homework_future_literature,homework_future_science,homework_future_math,
+learning_to_study,learning_to_homeworks,poshtibany,]
 
 
 
