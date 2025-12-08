@@ -2,8 +2,8 @@ from core.browser import BrowserManager
 from core.reporter import generate_report
 
 # لیست تمام تست‌ها
-import tests_site.open_site
-import tests_site.login
+import tests_site.open_site as open_site
+import tests_site.login as login 
 
 tests_list = [open_site, login]
 

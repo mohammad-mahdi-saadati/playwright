@@ -1,5 +1,5 @@
 from playwright.sync_api import sync_playwright
-def open_site(p, url: str = "https://danio.ir/"):
+def open_site(p, url: str):
     browser = None
     context = None
     page = None
@@ -19,3 +19,7 @@ def open_site(p, url: str = "https://danio.ir/"):
     except Exception as e:
         print(f"❌ Failed to open site: {str(e)}")
         raise
+def run(page):
+    page.goto( "https://danio.ir/")
+    page.wait_for_timeout(1500)
+    return {"name": "open_site", "status": "passed"}
