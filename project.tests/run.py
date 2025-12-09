@@ -28,7 +28,6 @@ learning_to_study,learning_to_homeworks,poshtibany,]
 
 browser = BrowserManager()
 page = browser.start()
-
 results = []
 
 for test_module in tests_list:
