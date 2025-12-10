@@ -19,7 +19,8 @@ def run(page):
             return {
                 "name": "login_buttons_check",
                 "success": False,
-                "error": f"دکمه '{missing_btn}' بعد از ورود دیده نشد"
+                "error": f"Button '{missing_btn}' was not visible after entering the page"
+
             }
 
     except Exception as e:

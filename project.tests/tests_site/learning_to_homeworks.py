@@ -7,7 +7,7 @@ def run(page):
             return {
                 "name": "click_icon_and_homework",
                 "success": False,
-                "error": "آیکون سبز مورد نظر پیدا نشد"
+                "error": "The required green icon was not found."
             }
         page.click(icon_selector, timeout=2000)
         page.wait_for_timeout(600)
@@ -16,7 +16,7 @@ def run(page):
             return {
                 "name": "click_icon_and_homework",
                 "success": False,
-                "error": "بعد از کلیک روی آیکون، دکمه «تکلیف» پیدا نشد❌"
+                "error": "After clicking the icon, the «تکلیف» button was not found ❌"
             }
         page.click("text=تکلیف", timeout=2000)
         page.wait_for_timeout(800)
@@ -27,13 +27,13 @@ def run(page):
             return {
                 "name": "click_icon_and_homework",
                 "success": True,
-                "message": "✔ کلیک روی آیکون و ورود به تکلیف موفقیت‌آمیز بود"
+                "message": "✔ Clicking the icon and entering the «تکلیف» was successful."
             }
         else:
             return {
                 "name": "click_icon_and_homework",
                 "success": False,
-                "error": "تب‌های تکلیف قابل مشاهده نیستند، ورود ناموفق"
+                "error": "The «تکلیف» tabs are not visible; homework entry failed."
             }
     except Exception as e:
         return {

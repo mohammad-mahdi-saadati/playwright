@@ -7,7 +7,7 @@ def run(page):
             return {
                 "name": "support_test",
                 "success": False,
-                "error": "❌ ورودی پیام پشتیبانی پیدا نشد!"
+                "error": "❌ The support message input was not found!"
             }
         test_message = "تست"
         page.fill(message_input_selector, test_message)
@@ -18,7 +18,7 @@ def run(page):
             return {
                 "name": "support_test",
                 "success": False,
-                "error": "❌ دکمه ارسال هنوز غیرفعال است! پیام ثبت نشده."
+                "error": "❌ The send button is still disabled! Message was not submitted."
             }
         page.click(send_button_selector, timeout=2000)
         page.wait_for_timeout(1200)
@@ -26,12 +26,12 @@ def run(page):
             return {
                 "name": "support_test",
                 "success": False,
-                "error": "❌ پیام ارسال شد اما در لیست پیام‌ها ظاهر نشد!"
+                "error": "❌ Message was sent but did not appear in the message list!"
             }
         return {
             "name": "support_test",
             "success": True,
-            "message": "✔ پیام با موفقیت ارسال شد و در چت نمایش داده شد."
+            "message": "✔ Message was successfully sent and displayed in the chat."
         }
     except Exception as e:
         return {

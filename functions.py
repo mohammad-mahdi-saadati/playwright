@@ -961,13 +961,12 @@ def open_site(p, url: str = "https://www.eduland.ir/"):
         page.wait_for_timeout(2000)
         print(f"✅ Opened site: {url}")
 
-        # چک کنیم آیا صفحه درست لود شده (مثلاً لوگوی سایت دیده بشه یا متن خاصی)
         bug = detect_and_report_bug(
             page,
             chapter="system",
             skill="open_site",
             stage="after_open",
-            require_submit_visible=False  # اینجا فقط خطاهای عمومی رو چک می‌کنیم
+            require_submit_visible=False  
         )
         if bug:
             raise Exception(f"Site open detected bug: {bug}")
@@ -1003,7 +1002,7 @@ def login(page, username: str = "danesh_t1", password: str = "danesh_t1"):
         page.click('button[type="submit"]')
         page.wait_for_timeout(2000)
 
-        # بررسی کنیم آیا خطا یا ارور 500 ظاهر شده؟
+
         bug = detect_and_report_bug(
             page,
             chapter="system",
@@ -1043,21 +1042,18 @@ def click_subject(
     """
 
     try:
-        # رفتن به صفحه کلاس‌ها
         page.click("text=کلاس‌ها")
         page.wait_for_timeout(3000)
 
         if verbose:
             print(f"\n🔹 Trying to click {subject} number {subject_index} ...")
 
-        # کلیک روی nامین دکمه درس موردنظر
         buttons = page.locator(f"button:has-text('{subject}')")
         buttons.nth(subject_index - 1).click()
 
         if verbose:
             print(f"✅ Clicked {subject} number {subject_index}")
 
-        # بعد از کلیک روی درس، برو سراغ دکمه مهارت‌ها
         if verbose:
             print("🔹 Looking for مهارت‌ها button ...")
 
@@ -1082,7 +1078,7 @@ def click_subject(
         )
         return False
 
-#  و خب پری------------------------------
+#  ------------------------------
 # 4. کلیک روی یک مهارت خاص
 # ------------------------------
 
@@ -1168,9 +1164,7 @@ def click_skills_by_name(
     if end is None or end > len(skills):
         end = len(skills)
 
-    # -------------------------------------------------------------------
-    # 1) PRE-COUNTING — Count repetitions of skills before "start"
-    # -------------------------------------------------------------------
+
     pre_counts = {}
     for idx in range(start):
         s = skills[idx]
@@ -1203,9 +1197,7 @@ def click_skills_by_name(
     if math_chapters:
         select_math_chapter()
 
-    # -------------------------------------------------------------------
-    # MAIN LOOP
-    # -------------------------------------------------------------------
+
     i = start
     while i < end:
         ensure_subject_is_open()
@@ -1213,16 +1205,14 @@ def click_skills_by_name(
         skill = skills[i]
         chapter = chapters[i]
 
-        # ----------------------------------------
-        # nth occurrence based on pre-counted list
-        # ----------------------------------------
+
         nth_index = pre_counts.get(skill, 0)
         pre_counts[skill] = nth_index + 1
 
         print(f"\n🔹 Skill {i+1}/{len(skills)} → {skill} (occurrence #{nth_index})")
 
         try:
-            # Try multiple locator methods
+
             target = None
             if page.get_by_role("link", name=skill).count() > 0:
                 target = page.get_by_role("link", name=skill)
@@ -1262,9 +1252,6 @@ def click_skills_by_name(
 
                     last_height = new_height
 
-            # ----------------------------------------
-            # CLICK EXACT occurrence based on nth_index
-            # ----------------------------------------
             index_to_click = nth_index if nth_index < count else count - 1
 
             print(f"👉 Clicking occurrence {index_to_click} of skill '{skill}'")
@@ -1356,19 +1343,17 @@ def submit_in_skill(
                 stage=f"try{attempt}",
                 require_submit_visible=False
             )
-            if tag:  # یعنی مشکلی پیدا شده
+            if tag: 
                 if on_fail_callback:
                     on_fail_callback(page, tag)
                 return
 
-            # مرحله ۳: کلیک روی "تایید" اگر وجود داشت
             if page.locator("text=تایید").is_visible():
                 page.click("text=تایید")
                 page.wait_for_timeout(wait_time)
             else:
                 print("ℹ️ 'تایید' button not present, skipping...")
 
-            # مرحله ۴: کلیک روی "گرفتم" اگر وجود داشت
             try:
                 page.wait_for_selector("text=گرفتم", timeout=2000)
                 page.click("text=گرفتم")
@@ -1420,7 +1405,6 @@ def go_through_levels(page, skill_name: str, chapter: str, wait_time: int = 2000
     try:
         # 🔙 مرحله ۱: عقب رفتن تا وقتی پیام توقف دیده بشه
         while True:
-            # پیام‌های مختلف توقف عقب‌گرد
             if (
                 page.locator("text=سطح قبل وجود ندارد").is_visible()
                 or page.locator("text=سطح پایینتر وجود ندارد").is_visible()
@@ -1715,7 +1699,7 @@ def solve_all_levels(
         for attempt in range(1, repeat_per_level + 1):
             print(f"🔁 Attempt {attempt}/{repeat_per_level} for {skill_name} in {chapter}")
             try:
-                # چک کنیم آیا این پایین‌ترین سطح است
+
                 at_first_level = (
                     page.locator("text=سطح قبل وجود ندارد").is_visible()
                     or page.locator("text=سطح پایینتر وجود ندارد").is_visible()
@@ -1758,7 +1742,6 @@ def solve_all_levels(
                 except:
                     print("⚠️ 'گرفتم' button not found, continuing...")
 
-                # بعد از ارسال → برو سطح بعد (یک یا دوبار بسته به سطح)
                 times_to_click = 1 if at_first_level else 2
                 if not click_next_level(times_to_click):
                     return
@@ -1840,9 +1823,7 @@ def solve_science_questions(
             except:
                 print("⚠️ 'گرفتم' دیده نشد.")
 
-            # ---------------------------------------
-            # 🔁 ادامه چرخه (بدون سطح بعد)
-            # ---------------------------------------
+
 
         except Exception as e:
             print(f"❌ خطای غیرمنتظره: {e}")

@@ -18,11 +18,12 @@ import tests_site.homework_future_math as homework_future_math
 import tests_site.poshtibany as poshtibany
 import tests_site.learning_to_homeworks as learning_to_homeworks
 import tests_site.learning_to_study as learning_to_study
-tests_list = [open_site, login,quiz, homework,
+import tests_site.performance as performance
+tests_list = [open_site, login,quiz,performance, homework,
 homework_current_literature,homework_current_science,homework_current_math,
-#homework_past_literature,homework_past_science,homework_past_math,
-#homework_future_literature,homework_future_science,homework_future_math,
-learning_to_study,learning_to_homeworks,poshtibany,]
+homework_past_literature,homework_past_science,homework_past_math,
+homework_future_literature,homework_future_science,homework_future_math,
+performance,]
 
 
 

@@ -21,12 +21,12 @@ def run(page):
             return {
                 "name": "exam_check",
                 "success": False,
-                "error": f"❌ آزمون‌های زیر پیدا نشدند: {', '.join(missing_tests)}"
+                "error": f"❌ The following tests were not found: {', '.join(missing_tests)}"
             }
         return {
             "name": "exam_check",
             "success": True,
-            "message": "✔ تمام آزمون‌های آبان ماه (فارسی، ریاضی، علوم) موجود هستند."
+            "message": "✔ All November tests («فارسی», «ریاضی», «علوم») are present."
         }
     except Exception as e:
         return {

@@ -13,7 +13,7 @@ def run(page):
             return {
                 "name": "learning_button_test",
                 "success": False,
-                "error": "درس یا تکلیف ظاهر نشد"
+                "error": "«درس» or «تکلیف» did not appear."
             }
     except Exception as e:
         return {"name": "learning_button_test", "success": False, "error": str(e)}
