@@ -1485,7 +1485,7 @@ def detect_and_report_bug(
     screenshot_prefix: str | None = None,
     on_detect_callback: Callable | None = None,
     verbose: bool = True,
-    base_dir: str = r"D:\کار\دانیو\تست"
+    base_dir: str = r"D:\کار\دانیو\تست\bugs"
 ) -> str | None:
 
     page_source = ""
