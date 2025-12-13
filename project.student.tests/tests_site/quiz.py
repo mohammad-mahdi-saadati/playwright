@@ -19,18 +19,18 @@ def run(page):
                 continue
         if missing_tests:
             return {
-                "name": "exam_check",
+                "name": "quiz_check",
                 "success": False,
                 "error": f"❌ The following tests were not found: {', '.join(missing_tests)}"
             }
         return {
-            "name": "exam_check",
+            "name": "quiz_check",
             "success": True,
             "message": "✔ All November tests («فارسی», «ریاضی», «علوم») are present."
         }
     except Exception as e:
         return {
-            "name": "exam_check",
+            "name": "quiz_check",
             "success": False,
             "error": str(e)
         }

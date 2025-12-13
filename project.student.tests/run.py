@@ -19,11 +19,14 @@ import tests_site.poshtibany as poshtibany
 import tests_site.learning_to_homeworks as learning_to_homeworks
 import tests_site.learning_to_study as learning_to_study
 import tests_site.performance as performance
-tests_list = [open_site, login,quiz,performance, homework,
+import tests_site.classes as classes
+import tests_site.user_account as user_account
+tests_list = [open_site, login,quiz,performance,classes,homework,
 homework_current_literature,homework_current_science,homework_current_math,
 homework_past_literature,homework_past_science,homework_past_math,
 homework_future_literature,homework_future_science,homework_future_math,
-performance,]
+learning_to_study,
+poshtibany]
 
 
 

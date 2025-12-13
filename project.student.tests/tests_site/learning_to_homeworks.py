@@ -1,6 +1,5 @@
 def run(page):
     try:
-
         icon_selector = "div.MuiBox-root svg"
 
         if not page.is_visible(icon_selector):
@@ -23,18 +22,22 @@ def run(page):
         current = page.is_visible("text=جاری")
         future  = page.is_visible("text=آینده")
         past    = page.is_visible("text=گذشته")
-        if current and future and past:
-            return {
-                "name": "click_icon_and_homework",
-                "success": True,
-                "message": "✔ Clicking the icon and entering the «تکلیف» was successful."
-            }
-        else:
+        if not (current and future and past):
             return {
                 "name": "click_icon_and_homework",
                 "success": False,
                 "error": "The «تکلیف» tabs are not visible; homework entry failed."
             }
+        page.wait_for_selector(icon_selector, timeout=2000)
+        page.click(icon_selector)
+        page.wait_for_timeout(600)
+
+        return {
+            "name": "click_icon_and_homework",
+            "success": True,
+            "message": "✔ Clicking the icon, entering «تکلیف», and returning back was successful."
+        }
+
     except Exception as e:
         return {
             "name": "click_icon_and_homework",

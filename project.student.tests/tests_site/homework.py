@@ -15,5 +15,6 @@ def run(page):
                 "success": False,
                 "error": "«درس» or «تکلیف» did not appear."
             }
+            
     except Exception as e:
         return {"name": "learning_button_test", "success": False, "error": str(e)}
