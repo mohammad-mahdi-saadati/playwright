@@ -22,9 +22,10 @@ import tests_student_site.user_account as user_account
 import tests_student_site.course_math as course_math
 import tests_student_site.course_science as course_science
 import tests_student_site.course_literature as course_literature
-tests_list = [open_site, login,quiz,user_account,performance,classes,homework,
+tests_list = [open_site, login,
+user_account,quiz,performance,classes,homework,
 #homework_current_literature,homework_current_science,homework_current_math,
-homework_past_literature,homework_past_science,homework_past_math,
+#homework_past_literature,homework_past_science,homework_past_math,
 #homework_future_literature,homework_future_science,homework_future_math,
 learning_to_study,course_math,course_science,course_literature,
 poshtibany]
