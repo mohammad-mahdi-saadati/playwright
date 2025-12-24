@@ -1,8 +1,10 @@
 from core.browser import BrowserManager
 from core.reporter import generate_report
+import tests_teacher_site.open_site as open_site
+import tests_teacher_site.login as login 
+import tests_teacher_site.user_account as user_account
 
-
-tests_list = [open_site, login]
+tests_list = [open_site, login,user_account]
 
 browser = BrowserManager()
 page = browser.start()
