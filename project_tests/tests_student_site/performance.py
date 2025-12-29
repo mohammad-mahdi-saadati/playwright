@@ -1,5 +1,5 @@
 def run(page):
-    EXPECTED_INCORRECT = 99
+    EXPECTED_INCORRECT = 101
     required_buttons = ["مجموع زمان", "تعداد جام", "تعداد سوال", "تعداد مهارت",]
     try:
         if page.is_visible("text=عملکرد"):

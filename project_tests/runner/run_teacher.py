@@ -1,10 +1,12 @@
-from core.browser import BrowserManager
-from core.reporter import generate_report
-import tests_teacher_site.open_site as open_site
-import tests_teacher_site.login as login 
-import tests_teacher_site.user_account as user_account
+from project_tests.core.browser import BrowserManager
+from project_tests.core.reporter import generate_report
+import  project_tests.tests_teacher_site.open_site as open_site
+import  project_tests.tests_teacher_site.login as login 
+import  project_tests.tests_teacher_site.user_account as user_account
+import  project_tests.tests_teacher_site.student as student
 
-tests_list = [open_site, login,user_account]
+
+tests_list = [open_site, login,user_account,student]
 
 browser = BrowserManager()
 page = browser.start()

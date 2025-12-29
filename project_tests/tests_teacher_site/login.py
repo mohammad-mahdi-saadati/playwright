@@ -2,7 +2,7 @@ def run(page):
     try:
         page.click("text=ورود", timeout=5000)
         page.wait_for_selector('input[name="username"]', timeout=5000)
-        page.fill('input[name="username"]', "demo.s1")
+        page.fill('input[name="username"]', "demo.t1")
         page.fill('input[name="password"]', "1111")
         page.click('button[type="submit"]')
         page.wait_for_timeout(2000)

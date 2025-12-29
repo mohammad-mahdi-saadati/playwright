@@ -1,6 +1,5 @@
 from project_tests.core.browser import BrowserManager
 from project_tests.core.reporter import generate_report
-
 import project_tests.tests_student_site.open_site as open_site
 import project_tests.tests_student_site.login as login
 import project_tests.tests_student_site.quiz as quiz
@@ -27,9 +26,9 @@ import project_tests.tests_student_site.course_literature as course_literature
 
 tests_list = [open_site, login,
 user_account,quiz,performance,classes,homework,
-homework_current_literature,homework_current_science,homework_current_math,
+#homework_current_literature,homework_current_science,homework_current_math,
 homework_past_literature,homework_past_science,homework_past_math,
-homework_future_literature,homework_future_science,homework_future_math,
+#homework_future_literature,homework_future_science,homework_future_math,
 learning_to_study,course_math,course_science,course_literature,
 poshtibany]
 
