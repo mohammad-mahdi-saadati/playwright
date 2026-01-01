@@ -1,7 +1,8 @@
 def run(page):
     try:
-        page.click('a[href="/student/profile"]')
-        page.wait_for_timeout(600)
+        page.wait_for_timeout(1000)
+        page.click('a[href="/student/profile"]',timeout=5000)
+        page.wait_for_timeout(1000)
         for w in ["علامه دهخدا", "همه نشان‌ها", "اطلاعات شخصی"]:
             if not page.is_visible(f"text={w}"):
                 return {
@@ -10,7 +11,7 @@ def run(page):
                     "error": f'not found: "{w}"'
                 }
         page.click("text=همه نشان‌ها")
-        page.wait_for_timeout(800)
+        page.wait_for_timeout(1000)
         for w in ["نشان دقت", "نشان سوال"," نشان‌های شما"]:
             if not page.is_visible(f"text={w}"):
                 return {
@@ -19,7 +20,7 @@ def run(page):
                     "error": f'not found: "{w}"'
                 }
         page.go_back()
-        page.wait_for_timeout(600)
+        page.wait_for_timeout(1000)
         page.go_back()
         page.wait_for_url("**/student", timeout=3000)
         return {

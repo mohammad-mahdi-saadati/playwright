@@ -1,6 +1,6 @@
 def run(page):
     try:
-        page.click('پروین اعتصامی')
+        page.click("حساب کاربری")
         page.wait_for_timeout(600)
         for w in ["خروج از حساب کاربری", "تغییر رمز", "نام کاربری"]:
             if not page.is_visible(f"text={w}"):

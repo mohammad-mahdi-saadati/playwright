@@ -22,7 +22,7 @@ def run(page):
         page.wait_for_timeout(500)
 
         send_button = "button._sendBtn_1qqj4_26"
-        page.click(send_button, timeout=2000)
+        page.click(send_button, timeout=4000)
         page.wait_for_timeout(1200)
 
         if not page.is_visible(f"text={test_message}"):
@@ -34,7 +34,7 @@ def run(page):
 
         # 👇 بستن پشتیبانی
         close_button = "div._closeModal_1qqj4_139"
-        page.click(close_button, timeout=2000)
+        page.click(close_button, timeout=4000)
         page.wait_for_timeout(500)
 
         return {

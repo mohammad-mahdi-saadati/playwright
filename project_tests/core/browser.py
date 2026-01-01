@@ -24,7 +24,7 @@ class BrowserManager:
                 )
             )
             self.page = self.context.new_page()
-            self.page.goto("https://danio.ir", timeout=30000)
+            self.page.goto("https://www.eduland.ir/auth/login", timeout=30000)
             try:
                 self.page.wait_for_load_state("load", timeout=10000)
             except TimeoutError:

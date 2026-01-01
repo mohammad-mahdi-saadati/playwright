@@ -1,12 +1,12 @@
 def run(page):
     try:
-        page.click("text=ورود", timeout=5000)
-        page.wait_for_selector('input[name="username"]', timeout=5000)
-        page.fill('input[name="username"]', "demo.s1")
-        page.fill('input[name="password"]', "1111")
+        page.click("text=ورود", timeout=10000)
+        page.wait_for_selector('input[name="username"]', timeout=10000)
+        page.fill('input[name="username"]', "danesh_s1")
+        page.fill('input[name="password"]', "danesh_s1")
         page.click('button[type="submit"]')
-        page.wait_for_timeout(2000)
-        required_buttons = [ "آزمون", "تکلیف", "کلاس", "عملکرد"]
+        page.wait_for_timeout(3000)
+        required_buttons = [ "به دانیو خوش آمدی!", "تکلیف", "کلاس", "عملکرد"]
         all_visible = True
         for btn_text in required_buttons:
             if not page.is_visible(f"text={btn_text}"):

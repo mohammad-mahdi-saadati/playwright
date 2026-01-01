@@ -16,7 +16,7 @@ def run(page):
                     "error": f'not found: "{text}"'
                 }
 
-        search_input = page.locator('input[placeholder="جستجو"]')
+        search_input = page.locator('input[placeholder="جست‌وجو"]')
         search_input.fill("سینا")
         page.wait_for_timeout(800)
 

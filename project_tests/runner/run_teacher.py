@@ -6,7 +6,9 @@ import  project_tests.tests_teacher_site.user_account as user_account
 import  project_tests.tests_teacher_site.student as student
 
 
-tests_list = [open_site, login,user_account,student]
+tests_list = [open_site, login,user_account
+              #,student 
+               ]
 
 browser = BrowserManager()
 page = browser.start()

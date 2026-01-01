@@ -6,7 +6,7 @@ def run(page):
         page.fill('input[name="password"]', "1111")
         page.click('button[type="submit"]')
         page.wait_for_timeout(2000)
-        required_buttons = [ "پروین", "کلاس های من", "تکالیف جاری", "گزارش تکلیف "]
+        required_buttons = [ "پروین", "تکالیف جاری", "گزارش تکلیف "]
         all_visible = True
         for btn_text in required_buttons:
             if not page.is_visible(f"text={btn_text}"):

@@ -1,7 +1,7 @@
 def run(page):
     try:
-        page.click("text=آزمون", timeout=3000)
-        page.wait_for_timeout(800)
+        page.click("text=آزمون", timeout=10000)
+        page.wait_for_timeout(5000)
         required_tests = [
             ("فارسی", "آبان ماه"),
             ("ریاضی", "آبان ماه"),

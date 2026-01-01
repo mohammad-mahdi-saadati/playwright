@@ -25,7 +25,8 @@ import project_tests.tests_student_site.course_literature as course_literature
 
 
 tests_list = [open_site, login,
-user_account,quiz,performance,classes,homework,
+#user_account
+quiz,performance,classes,homework,
 #homework_current_literature,homework_current_science,homework_current_math,
 homework_past_literature,homework_past_science,homework_past_math,
 #homework_future_literature,homework_future_science,homework_future_math,

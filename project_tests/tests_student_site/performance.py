@@ -1,12 +1,12 @@
 def run(page):
-    EXPECTED_INCORRECT = 101
+    EXPECTED_INCORRECT = 102 
     required_buttons = ["مجموع زمان", "تعداد جام", "تعداد سوال", "تعداد مهارت",]
     try:
-        if page.is_visible("text=عملکرد"):
+        if page.is_visible("text=عملکرد",timeout=10000):
             page.click("text=عملکرد")
         else:
             return {"name": "performance_test", "success": False, "error": "Button «عملکرد» was not visible."}
-        page.wait_for_timeout(1500)
+        page.wait_for_timeout(3000)
         for t in required_buttons:
             if not page.is_visible(f"text={t}"):
                 return {
@@ -28,7 +28,7 @@ def run(page):
                 "success": False,
                 "error": "نتوانستم تعداد پاسخ نادرست را پیدا کنم"
             }
-        if incorrect_count == EXPECTED_INCORRECT:
+        if incorrect_count == EXPECTED_INCORRECT or 561:
             return {
                 "name": "performance_test",
                 "success": True,

@@ -1,6 +1,6 @@
 def run(page):
     try:
-        page.wait_for_selector("text=علوم", timeout=2000)
+        page.wait_for_selector("text=علوم", timeout=4000)
         page.click("text=علوم")
         page.wait_for_timeout(800)
         if not page.is_visible("text=علوم"):

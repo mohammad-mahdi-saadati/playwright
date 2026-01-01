@@ -1,8 +1,8 @@
 def run(page):
     try:
-        page.wait_for_load_state("domcontentloaded", timeout=2000)
-        page.click("text=تکلیف ", timeout=2000)
-        page.click("text=همه تکالیف ", timeout=2000)
+        page.wait_for_load_state("domcontentloaded", timeout=4000)
+        page.click("text=تکلیف ", timeout=4000)
+        page.click("text=همه تکالیف ", timeout=4000)
         page.wait_for_timeout(1000)
         current_visible = page.is_visible("text=جاری")
         future_visible = page.is_visible("text=آینده")

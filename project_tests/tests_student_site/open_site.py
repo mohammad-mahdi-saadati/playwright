@@ -1,6 +1,6 @@
 def run(page):
     try:
-        page.goto("https://danio.ir/", timeout=5000)
+        page.goto("https://www.eduland.ir/auth/login", timeout=5000)
         page.wait_for_timeout(1500)
         print("UA:", page.evaluate("navigator.userAgent"))
         print("WIDTH:", page.evaluate("window.innerWidth"))

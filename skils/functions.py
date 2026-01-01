@@ -1355,7 +1355,7 @@ def submit_in_skill(
                 print("ℹ️ 'تایید' button not present, skipping...")
 
             try:
-                page.wait_for_selector("text=گرفتم", timeout=2000)
+                page.wait_for_selector("text=گرفتم", timeout=4000)
                 page.click("text=گرفتم")
                 page.wait_for_timeout(wait_time)
             except:
@@ -1736,7 +1736,7 @@ def solve_all_levels(
                     print("ℹ️ 'تایید' button not present, skipping...")
 
                 try:
-                    page.wait_for_selector("text=گرفتم", timeout=2000)
+                    page.wait_for_selector("text=گرفتم", timeout=4000)
                     page.click("text=گرفتم")
                     page.wait_for_timeout(wait_time)
                 except:

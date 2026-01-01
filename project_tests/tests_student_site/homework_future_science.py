@@ -3,7 +3,7 @@ LESSON = "علوم"
 TASK_NUMBER = "چهارم"   
 def run(page):
     try:
-        page.click(f"text={TAB}", timeout=2000)
+        page.click(f"text={TAB}", timeout=4000)
         page.wait_for_timeout(500)
 
         if not page.is_visible(f"text={LESSON}"):
@@ -13,7 +13,7 @@ def run(page):
                 "error": f"❌ Lesson '{LESSON}' was not found in tab '{TAB}'."
             }
 
-        page.click(f"text={LESSON}", timeout=2000)
+        page.click(f"text={LESSON}", timeout=4000)
         page.wait_for_timeout(800)
 
         task_found = (
